@@ -18,41 +18,23 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Leevel\Database\Proxy;
+namespace Leevel\Database;
 
 use Closure;
-use Leevel\Database\Condition;
-use Leevel\Database\IDatabase;
-use Leevel\Database\Manager;
-use Leevel\Database\Select;
-use Leevel\Di\Container;
 use PDO;
 
 /**
- * 代理 database.
+ * 代理.
  *
  * @author Xiangmin Liu <635750556@qq.com>
  *
- * @since 2017.06.10
+ * @since 2019.06.05
  *
  * @version 1.0
  * @codeCoverageIgnore
  */
-class Db implements IDb
+trait Proxy
 {
-    /**
-     * call.
-     *
-     * @param string $method
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    public static function __callStatic(string $method, array $args)
-    {
-        return self::proxy()->{$method}(...$args);
-    }
-
     /**
      * 返回 Pdo 查询连接.
      *
@@ -62,9 +44,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function pdo($master = false)
+    public function pdo($master = false)
     {
-        return self::proxy()->pdo($master);
+        return $this->proxy()->pdo($master);
     }
 
     /**
@@ -79,9 +61,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function query(string $sql, array $bindParams = [], $master = false, int $fetchType = PDO::FETCH_OBJ, $fetchArgument = null, array $ctorArgs = [])
+    public function query(string $sql, array $bindParams = [], $master = false, int $fetchType = PDO::FETCH_OBJ, $fetchArgument = null, array $ctorArgs = [])
     {
-        return self::proxy()->query($sql, $bindParams, $master, $fetchType, $fetchArgument, $ctorArgs);
+        return $this->proxy()->query($sql, $bindParams, $master, $fetchType, $fetchArgument, $ctorArgs);
     }
 
     /**
@@ -92,9 +74,9 @@ class Db implements IDb
      *
      * @return int|string
      */
-    public static function execute(string $sql, array $bindParams = [])
+    public function execute(string $sql, array $bindParams = [])
     {
-        return self::proxy()->execute($sql, $bindParams);
+        return $this->proxy()->execute($sql, $bindParams);
     }
 
     /**
@@ -104,17 +86,17 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function transaction(Closure $action)
+    public function transaction(Closure $action)
     {
-        return self::proxy()->transaction($action);
+        return $this->proxy()->transaction($action);
     }
 
     /**
      * 启动事务.
      */
-    public static function beginTransaction(): void
+    public function beginTransaction(): void
     {
-        self::proxy()->beginTransaction();
+        $this->proxy()->beginTransaction();
     }
 
     /**
@@ -122,25 +104,25 @@ class Db implements IDb
      *
      * @return bool
      */
-    public static function inTransaction(): bool
+    public function inTransaction(): bool
     {
-        return self::proxy()->inTransaction();
+        return $this->proxy()->inTransaction();
     }
 
     /**
      * 用于非自动提交状态下面的查询提交.
      */
-    public static function commit(): void
+    public function commit(): void
     {
-        self::proxy()->commit();
+        $this->proxy()->commit();
     }
 
     /**
      * 事务回滚.
      */
-    public static function rollBack(): void
+    public function rollBack(): void
     {
-        self::proxy()->rollBack();
+        $this->proxy()->rollBack();
     }
 
     /**
@@ -150,9 +132,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function lastInsertId(?string $name = null): string
+    public function lastInsertId(?string $name = null): string
     {
-        return self::proxy()->lastInsertId($name);
+        return $this->proxy()->lastInsertId($name);
     }
 
     /**
@@ -160,9 +142,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function lastSql(): array
+    public function lastSql(): array
     {
-        return self::proxy()->lastSql();
+        return $this->proxy()->lastSql();
     }
 
     /**
@@ -170,33 +152,33 @@ class Db implements IDb
      *
      * @return int
      */
-    public static function numRows(): int
+    public function numRows(): int
     {
-        return self::proxy()->numRows();
+        return $this->proxy()->numRows();
     }
 
     /**
      * 关闭数据库.
      */
-    public static function close(): void
+    public function close(): void
     {
-        self::proxy()->close();
+        $this->proxy()->close();
     }
 
     /**
      * 释放 PDO 预处理查询.
      */
-    public static function freePDOStatement(): void
+    public function freePDOStatement(): void
     {
-        self::proxy()->freePDOStatement();
+        $this->proxy()->freePDOStatement();
     }
 
     /**
      * 关闭数据库连接.
      */
-    public static function closeConnects(): void
+    public function closeConnects(): void
     {
-        self::proxy()->closeConnects();
+        $this->proxy()->closeConnects();
     }
 
     /**
@@ -207,9 +189,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function normalizeExpression(string $sql, string $tableName): string
+    public function normalizeExpression(string $sql, string $tableName): string
     {
-        return self::proxy()->normalizeExpression($sql, $tableName);
+        return $this->proxy()->normalizeExpression($sql, $tableName);
     }
 
     /**
@@ -221,9 +203,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function normalizeTableOrColumn(string $name, ?string $alias = null, ?string $as = null): string
+    public function normalizeTableOrColumn(string $name, ?string $alias = null, ?string $as = null): string
     {
-        return self::proxy()->normalizeTableOrColumn($name, $alias, $as);
+        return $this->proxy()->normalizeTableOrColumn($name, $alias, $as);
     }
 
     /**
@@ -234,9 +216,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function normalizeColumn(string $key, string $tableName): string
+    public function normalizeColumn(string $key, string $tableName): string
     {
-        return self::proxy()->normalizeColumn($key, $tableName);
+        return $this->proxy()->normalizeColumn($key, $tableName);
     }
 
     /**
@@ -247,9 +229,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function normalizeColumnValue($value, bool $quotationMark = true)
+    public function normalizeColumnValue($value, bool $quotationMark = true)
     {
-        return self::proxy()->normalizeColumnValue($value, $quotationMark);
+        return $this->proxy()->normalizeColumnValue($value, $quotationMark);
     }
 
     /**
@@ -259,9 +241,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function normalizeSqlType(string $sql): string
+    public function normalizeSqlType(string $sql): string
     {
-        return self::proxy()->normalizeSqlType($sql);
+        return $this->proxy()->normalizeSqlType($sql);
     }
 
     /**
@@ -271,9 +253,9 @@ class Db implements IDb
      *
      * @return int
      */
-    public static function normalizeBindParamType($value): int
+    public function normalizeBindParamType($value): int
     {
-        return self::proxy()->normalizeBindParamType($value);
+        return $this->proxy()->normalizeBindParamType($value);
     }
 
     /**
@@ -283,9 +265,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function parseDsn(array $option): string
+    public function parseDsn(array $option): string
     {
-        return self::proxy()->parseDsn($option);
+        return $this->proxy()->parseDsn($option);
     }
 
     /**
@@ -296,9 +278,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function tableNames(string $dbName, $master = false): array
+    public function tableNames(string $dbName, $master = false): array
     {
-        return self::proxy()->tableNames($dbName, $master);
+        return $this->proxy()->tableNames($dbName, $master);
     }
 
     /**
@@ -309,9 +291,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function tableColumns(string $tableName, $master = false): array
+    public function tableColumns(string $tableName, $master = false): array
     {
-        return self::proxy()->tableColumns($tableName, $master);
+        return $this->proxy()->tableColumns($tableName, $master);
     }
 
     /**
@@ -321,9 +303,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function identifierColumn($name): string
+    public function identifierColumn($name): string
     {
-        return self::proxy()->identifierColumn($name);
+        return $this->proxy()->identifierColumn($name);
     }
 
     /**
@@ -334,9 +316,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function limitCount(?int $limitCount = null, ?int $limitOffset = null): string
+    public function limitCount(?int $limitCount = null, ?int $limitOffset = null): string
     {
-        return self::proxy()->limitCount($limitCount, $limitOffset);
+        return $this->proxy()->limitCount($limitCount, $limitOffset);
     }
 
     /**
@@ -344,9 +326,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function databaseCondition(): Condition
+    public function databaseCondition(): Condition
     {
-        return self::proxy()->databaseCondition();
+        return $this->proxy()->databaseCondition();
     }
 
     /**
@@ -354,9 +336,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\IDatabase
      */
-    public static function databaseConnect(): IDatabase
+    public function databaseConnect(): IDatabase
     {
-        return self::proxy()->databaseConnect();
+        return $this->proxy()->databaseConnect();
     }
 
     /**
@@ -364,9 +346,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function selfDatabaseSelect(): Select
+    public function selfDatabaseSelect(): Select
     {
-        return self::proxy()->selfDatabaseSelect();
+        return $this->proxy()->selfDatabaseSelect();
     }
 
     /**
@@ -376,9 +358,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function sql(bool $flag = true): Select
+    public function sql(bool $flag = true): Select
     {
-        return self::proxy()->sql($flag);
+        return $this->proxy()->sql($flag);
     }
 
     /**
@@ -388,9 +370,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function master(bool $master = false): Select
+    public function master(bool $master = false): Select
     {
-        return self::proxy()->master($master);
+        return $this->proxy()->master($master);
     }
 
     /**
@@ -402,9 +384,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function fetchArgs(int $fetchStyle, $fetchArgument = null, array $ctorArgs = []): Select
+    public function fetchArgs(int $fetchStyle, $fetchArgument = null, array $ctorArgs = []): Select
     {
-        return self::proxy()->fetchArgs($fetchStyle, $fetchArgument, $ctorArgs);
+        return $this->proxy()->fetchArgs($fetchStyle, $fetchArgument, $ctorArgs);
     }
 
     /**
@@ -415,9 +397,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function asClass(string $className, array $args = []): Select
+    public function asClass(string $className, array $args = []): Select
     {
-        return self::proxy()->asClass($className, $args);
+        return $this->proxy()->asClass($className, $args);
     }
 
     /**
@@ -425,9 +407,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function asDefault(): Select
+    public function asDefault(): Select
     {
-        return self::proxy()->asDefault();
+        return $this->proxy()->asDefault();
     }
 
     /**
@@ -437,9 +419,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function asCollection(bool $acollection = true): Select
+    public function asCollection(bool $acollection = true): Select
     {
-        return self::proxy()->asCollection($acollection);
+        return $this->proxy()->asCollection($acollection);
     }
 
     /**
@@ -451,9 +433,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function select($data = null, array $bind = [], bool $flag = false)
+    public function select($data = null, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->select($data, $bind, $flag);
+        return $this->proxy()->select($data, $bind, $flag);
     }
 
     /**
@@ -466,9 +448,9 @@ class Db implements IDb
      *
      * @return null|array|int
      */
-    public static function insert($data, array $bind = [], bool $replace = false, bool $flag = false)
+    public function insert($data, array $bind = [], bool $replace = false, bool $flag = false)
     {
-        return self::proxy()->insert($data, $bind, $replace, $flag);
+        return $this->proxy()->insert($data, $bind, $replace, $flag);
     }
 
     /**
@@ -481,9 +463,9 @@ class Db implements IDb
      *
      * @return null|array|int
      */
-    public static function insertAll(array $data, array $bind = [], bool $replace = false, bool $flag = false)
+    public function insertAll(array $data, array $bind = [], bool $replace = false, bool $flag = false)
     {
-        return self::proxy()->insertAll($data, $bind, $replace, $flag);
+        return $this->proxy()->insertAll($data, $bind, $replace, $flag);
     }
 
     /**
@@ -495,9 +477,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function update($data, array $bind = [], bool $flag = false)
+    public function update($data, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->update($data, $bind, $flag);
+        return $this->proxy()->update($data, $bind, $flag);
     }
 
     /**
@@ -510,9 +492,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function updateColumn(string $column, $value, array $bind = [], bool $flag = false)
+    public function updateColumn(string $column, $value, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->updateColumn($column, $value, $bind, $flag);
+        return $this->proxy()->updateColumn($column, $value, $bind, $flag);
     }
 
     /**
@@ -525,9 +507,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function updateIncrease(string $column, int $step = 1, array $bind = [], bool $flag = false)
+    public function updateIncrease(string $column, int $step = 1, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->updateIncrease($column, $step, $bind, $flag);
+        return $this->proxy()->updateIncrease($column, $step, $bind, $flag);
     }
 
     /**
@@ -540,9 +522,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function updateDecrease(string $column, int $step = 1, array $bind = [], bool $flag = false)
+    public function updateDecrease(string $column, int $step = 1, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->updateDecrease($column, $step, $bind, $flag);
+        return $this->proxy()->updateDecrease($column, $step, $bind, $flag);
     }
 
     /**
@@ -554,9 +536,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function delete(?string $data = null, array $bind = [], bool $flag = false)
+    public function delete(?string $data = null, array $bind = [], bool $flag = false)
     {
-        return self::proxy()->delete($data, $bind, $flag);
+        return $this->proxy()->delete($data, $bind, $flag);
     }
 
     /**
@@ -566,9 +548,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function truncate(bool $flag = false)
+    public function truncate(bool $flag = false)
     {
-        return self::proxy()->truncate($flag);
+        return $this->proxy()->truncate($flag);
     }
 
     /**
@@ -578,9 +560,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findOne(bool $flag = false)
+    public function findOne(bool $flag = false)
     {
-        return self::proxy()->findOne($flag);
+        return $this->proxy()->findOne($flag);
     }
 
     /**
@@ -590,9 +572,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findAll(bool $flag = false)
+    public function findAll(bool $flag = false)
     {
-        return self::proxy()->findAll($flag);
+        return $this->proxy()->findAll($flag);
     }
 
     /**
@@ -603,9 +585,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function find(?int $num = null, bool $flag = false)
+    public function find(?int $num = null, bool $flag = false)
     {
-        return self::proxy()->find($num, $flag);
+        return $this->proxy()->find($num, $flag);
     }
 
     /**
@@ -616,9 +598,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function value(string $field, bool $flag = false)
+    public function value(string $field, bool $flag = false)
     {
-        return self::proxy()->value($field, $flag);
+        return $this->proxy()->value($field, $flag);
     }
 
     /**
@@ -629,9 +611,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function pull(string $field, bool $flag = false)
+    public function pull(string $field, bool $flag = false)
     {
-        return self::proxy()->pull($field, $flag);
+        return $this->proxy()->pull($field, $flag);
     }
 
     /**
@@ -643,9 +625,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function list($fieldValue, ?string $fieldKey = null, bool $flag = false): array
+    public function list($fieldValue, ?string $fieldKey = null, bool $flag = false): array
     {
-        return self::proxy()->list($fieldValue, $fieldKey, $flag);
+        return $this->proxy()->list($fieldValue, $fieldKey, $flag);
     }
 
     /**
@@ -654,9 +636,9 @@ class Db implements IDb
      * @param int      $count
      * @param \Closure $chunk
      */
-    public static function chunk(int $count, Closure $chunk): void
+    public function chunk(int $count, Closure $chunk): void
     {
-        self::proxy()->chunk($count, $chunk);
+        $this->proxy()->chunk($count, $chunk);
     }
 
     /**
@@ -665,9 +647,9 @@ class Db implements IDb
      * @param int     $count
      * @param Closure $each
      */
-    public static function each(int $count, Closure $each): void
+    public function each(int $count, Closure $each): void
     {
-        self::proxy()->each($count, $each);
+        $this->proxy()->each($count, $each);
     }
 
     /**
@@ -679,9 +661,9 @@ class Db implements IDb
      *
      * @return array|int
      */
-    public static function findCount(string $field = '*', string $alias = 'row_count', bool $flag = false)
+    public function findCount(string $field = '*', string $alias = 'row_count', bool $flag = false)
     {
-        return self::proxy()->findCount($field, $alias, $flag);
+        return $this->proxy()->findCount($field, $alias, $flag);
     }
 
     /**
@@ -693,9 +675,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findAvg(string $field, string $alias = 'avg_value', bool $flag = false)
+    public function findAvg(string $field, string $alias = 'avg_value', bool $flag = false)
     {
-        return self::proxy()->findAvg($field, $alias, $flag);
+        return $this->proxy()->findAvg($field, $alias, $flag);
     }
 
     /**
@@ -707,9 +689,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findMax(string $field, string $alias = 'max_value', bool $flag = false)
+    public function findMax(string $field, string $alias = 'max_value', bool $flag = false)
     {
-        return self::proxy()->findMax($field, $alias, $flag);
+        return $this->proxy()->findMax($field, $alias, $flag);
     }
 
     /**
@@ -721,9 +703,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findMin(string $field, string $alias = 'min_value', bool $flag = false)
+    public function findMin(string $field, string $alias = 'min_value', bool $flag = false)
     {
-        return self::proxy()->findMin($field, $alias, $flag);
+        return $this->proxy()->findMin($field, $alias, $flag);
     }
 
     /**
@@ -735,9 +717,9 @@ class Db implements IDb
      *
      * @return mixed
      */
-    public static function findSum(string $field, string $alias = 'sum_value', bool $flag = false)
+    public function findSum(string $field, string $alias = 'sum_value', bool $flag = false)
     {
-        return self::proxy()->findSum($field, $alias, $flag);
+        return $this->proxy()->findSum($field, $alias, $flag);
     }
 
     /**
@@ -751,9 +733,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function page(int $currentPage, int $perPage = 10, bool $flag = false, bool $withTotal = true, string $column = '*'): array
+    public function page(int $currentPage, int $perPage = 10, bool $flag = false, bool $withTotal = true, string $column = '*'): array
     {
-        return self::proxy()->page($currentPage, $perPage, $flag, $withTotal, $column);
+        return $this->proxy()->page($currentPage, $perPage, $flag, $withTotal, $column);
     }
 
     /**
@@ -768,9 +750,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function pageHtml(int $currentPage, int $perPage = 10, bool $flag = false, string $column = '*', array $option = []): array
+    public function pageHtml(int $currentPage, int $perPage = 10, bool $flag = false, string $column = '*', array $option = []): array
     {
-        return self::proxy()->pageHtml($currentPage, $perPage, $flag, $column, $option);
+        return $this->proxy()->pageHtml($currentPage, $perPage, $flag, $column, $option);
     }
 
     /**
@@ -783,9 +765,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function pageMacro(int $currentPage, int $perPage = 10, bool $flag = false, array $option = []): array
+    public function pageMacro(int $currentPage, int $perPage = 10, bool $flag = false, array $option = []): array
     {
-        return self::proxy()->pageMacro($currentPage, $perPage, $flag, $option);
+        return $this->proxy()->pageMacro($currentPage, $perPage, $flag, $option);
     }
 
     /**
@@ -798,9 +780,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function pagePrevNext(int $currentPage, int $perPage = 10, bool $flag = false, array $option = []): array
+    public function pagePrevNext(int $currentPage, int $perPage = 10, bool $flag = false, array $option = []): array
     {
-        return self::proxy()->pagePrevNext($currentPage, $perPage, $flag, $option);
+        return $this->proxy()->pagePrevNext($currentPage, $perPage, $flag, $option);
     }
 
     /**
@@ -810,9 +792,9 @@ class Db implements IDb
      *
      * @return int
      */
-    public static function pageCount(string $cols = '*'): int
+    public function pageCount(string $cols = '*'): int
     {
-        return self::proxy()->pageCount($cols);
+        return $this->proxy()->pageCount($cols);
     }
 
     /**
@@ -822,9 +804,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function makeSql(bool $withLogicGroup = false): string
+    public function makeSql(bool $withLogicGroup = false): string
     {
-        return self::proxy()->makeSql($withLogicGroup);
+        return $this->proxy()->makeSql($withLogicGroup);
     }
 
     /**
@@ -835,9 +817,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function forPage(int $page, int $perPage = 15): Condition
+    public function forPage(int $page, int $perPage = 15): Condition
     {
-        return self::proxy()->forPage($page, $perPage);
+        return $this->proxy()->forPage($page, $perPage);
     }
 
     /**
@@ -847,9 +829,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function time(string $type = 'date'): Condition
+    public function time(string $type = 'date'): Condition
     {
-        return self::proxy()->time($type);
+        return $this->proxy()->time($type);
     }
 
     /**
@@ -857,9 +839,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function endTime(): Condition
+    public function endTime(): Condition
     {
-        return self::proxy()->endTime();
+        return $this->proxy()->endTime();
     }
 
     /**
@@ -869,9 +851,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function reset(?string $option = null): Condition
+    public function reset(?string $option = null): Condition
     {
-        return self::proxy()->reset($option);
+        return $this->proxy()->reset($option);
     }
 
     /**
@@ -881,9 +863,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function prefix(string $prefix): Condition
+    public function prefix(string $prefix): Condition
     {
-        return self::proxy()->prefix($prefix);
+        return $this->proxy()->prefix($prefix);
     }
 
     /**
@@ -894,9 +876,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function table($table, $cols = '*'): Select
+    public function table($table, $cols = '*'): Select
     {
-        return self::proxy()->table($table, $cols);
+        return $this->proxy()->table($table, $cols);
     }
 
     /**
@@ -904,9 +886,9 @@ class Db implements IDb
      *
      * @return string
      */
-    public static function getAlias(): string
+    public function getAlias(): string
     {
-        return self::proxy()->getAlias();
+        return $this->proxy()->getAlias();
     }
 
     /**
@@ -917,9 +899,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function columns($cols = '*', ?string $table = null): Select
+    public function columns($cols = '*', ?string $table = null): Select
     {
-        return self::proxy()->columns($cols, $table);
+        return $this->proxy()->columns($cols, $table);
     }
 
     /**
@@ -930,9 +912,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function setColumns($cols = '*', ?string $table = null): Select
+    public function setColumns($cols = '*', ?string $table = null): Select
     {
-        return self::proxy()->setColumns($cols, $table);
+        return $this->proxy()->setColumns($cols, $table);
     }
 
     /**
@@ -942,9 +924,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Select
      */
-    public static function where(...$cond): Select
+    public function where(...$cond): Select
     {
-        return self::proxy()->where(...$cond);
+        return $this->proxy()->where(...$cond);
     }
 
     /**
@@ -954,9 +936,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function orWhere(...$cond): Condition
+    public function orWhere(...$cond): Condition
     {
-        return self::proxy()->orWhere(...$cond);
+        return $this->proxy()->orWhere(...$cond);
     }
 
     /**
@@ -966,9 +948,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereRaw(string $raw): Condition
+    public function whereRaw(string $raw): Condition
     {
-        return self::proxy()->whereRaw($raw);
+        return $this->proxy()->whereRaw($raw);
     }
 
     /**
@@ -978,9 +960,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function orWhereRaw(string $raw): Condition
+    public function orWhereRaw(string $raw): Condition
     {
-        return self::proxy()->orWhereRaw($raw);
+        return $this->proxy()->orWhereRaw($raw);
     }
 
     /**
@@ -990,9 +972,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereExists($exists): Condition
+    public function whereExists($exists): Condition
     {
-        return self::proxy()->whereExists($exists);
+        return $this->proxy()->whereExists($exists);
     }
 
     /**
@@ -1002,9 +984,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNotExists($exists): Condition
+    public function whereNotExists($exists): Condition
     {
-        return self::proxy()->whereNotExists($exists);
+        return $this->proxy()->whereNotExists($exists);
     }
 
     /**
@@ -1014,9 +996,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereBetween(...$cond): Condition
+    public function whereBetween(...$cond): Condition
     {
-        return self::proxy()->whereBetween(...$cond);
+        return $this->proxy()->whereBetween(...$cond);
     }
 
     /**
@@ -1026,9 +1008,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNotBetween(...$cond): Condition
+    public function whereNotBetween(...$cond): Condition
     {
-        return self::proxy()->whereNotBetween(...$cond);
+        return $this->proxy()->whereNotBetween(...$cond);
     }
 
     /**
@@ -1038,9 +1020,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNull(...$cond): Condition
+    public function whereNull(...$cond): Condition
     {
-        return self::proxy()->whereNull(...$cond);
+        return $this->proxy()->whereNull(...$cond);
     }
 
     /**
@@ -1050,9 +1032,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNotNull(...$cond): Condition
+    public function whereNotNull(...$cond): Condition
     {
-        return self::proxy()->whereNotNull(...$cond);
+        return $this->proxy()->whereNotNull(...$cond);
     }
 
     /**
@@ -1062,9 +1044,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereIn(...$cond): Condition
+    public function whereIn(...$cond): Condition
     {
-        return self::proxy()->whereIn(...$cond);
+        return $this->proxy()->whereIn(...$cond);
     }
 
     /**
@@ -1074,9 +1056,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNotIn(...$cond): Condition
+    public function whereNotIn(...$cond): Condition
     {
-        return self::proxy()->whereNotIn(...$cond);
+        return $this->proxy()->whereNotIn(...$cond);
     }
 
     /**
@@ -1086,9 +1068,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereLike(...$cond): Condition
+    public function whereLike(...$cond): Condition
     {
-        return self::proxy()->whereLike(...$cond);
+        return $this->proxy()->whereLike(...$cond);
     }
 
     /**
@@ -1098,9 +1080,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereNotLike(...$cond): Condition
+    public function whereNotLike(...$cond): Condition
     {
-        return self::proxy()->whereNotLike(...$cond);
+        return $this->proxy()->whereNotLike(...$cond);
     }
 
     /**
@@ -1110,9 +1092,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereDate(...$cond): Condition
+    public function whereDate(...$cond): Condition
     {
-        return self::proxy()->whereDate(...$cond);
+        return $this->proxy()->whereDate(...$cond);
     }
 
     /**
@@ -1122,9 +1104,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereDay(...$cond): Condition
+    public function whereDay(...$cond): Condition
     {
-        return self::proxy()->whereDay(...$cond);
+        return $this->proxy()->whereDay(...$cond);
     }
 
     /**
@@ -1134,9 +1116,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereMonth(...$cond): Condition
+    public function whereMonth(...$cond): Condition
     {
-        return self::proxy()->whereMonth(...$cond);
+        return $this->proxy()->whereMonth(...$cond);
     }
 
     /**
@@ -1146,9 +1128,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function whereYear(...$cond): Condition
+    public function whereYear(...$cond): Condition
     {
-        return self::proxy()->whereYear(...$cond);
+        return $this->proxy()->whereYear(...$cond);
     }
 
     /**
@@ -1160,9 +1142,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function bind($names, $value = null, int $type = PDO::PARAM_STR): Condition
+    public function bind($names, $value = null, int $type = PDO::PARAM_STR): Condition
     {
-        return self::proxy()->bind($names, $value, $type);
+        return $this->proxy()->bind($names, $value, $type);
     }
 
     /**
@@ -1173,9 +1155,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function forceIndex($indexs, $type = 'FORCE'): Condition
+    public function forceIndex($indexs, $type = 'FORCE'): Condition
     {
-        return self::proxy()->forceIndex($indexs, $type);
+        return $this->proxy()->forceIndex($indexs, $type);
     }
 
     /**
@@ -1185,9 +1167,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function ignoreIndex($indexs): Condition
+    public function ignoreIndex($indexs): Condition
     {
-        return self::proxy()->ignoreIndex($indexs);
+        return $this->proxy()->ignoreIndex($indexs);
     }
 
     /**
@@ -1199,9 +1181,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function join($table, $cols, ...$cond): Condition
+    public function join($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->join($table, $cols, ...$cond);
+        return $this->proxy()->join($table, $cols, ...$cond);
     }
 
     /**
@@ -1213,9 +1195,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function innerJoin($table, $cols, ...$cond): Condition
+    public function innerJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->innerJoin($table, $cols, ...$cond);
+        return $this->proxy()->innerJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1227,9 +1209,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function leftJoin($table, $cols, ...$cond): Condition
+    public function leftJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->leftJoin($table, $cols, ...$cond);
+        return $this->proxy()->leftJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1241,9 +1223,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function rightJoin($table, $cols, ...$cond): Condition
+    public function rightJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->rightJoin($table, $cols, ...$cond);
+        return $this->proxy()->rightJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1255,9 +1237,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function fullJoin($table, $cols, ...$cond): Condition
+    public function fullJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->fullJoin($table, $cols, ...$cond);
+        return $this->proxy()->fullJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1269,9 +1251,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function crossJoin($table, $cols, ...$cond): Condition
+    public function crossJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->crossJoin($table, $cols, ...$cond);
+        return $this->proxy()->crossJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1283,9 +1265,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function naturalJoin($table, $cols, ...$cond): Condition
+    public function naturalJoin($table, $cols, ...$cond): Condition
     {
-        return self::proxy()->naturalJoin($table, $cols, ...$cond);
+        return $this->proxy()->naturalJoin($table, $cols, ...$cond);
     }
 
     /**
@@ -1296,9 +1278,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function union($selects, string $type = 'UNION'): Condition
+    public function union($selects, string $type = 'UNION'): Condition
     {
-        return self::proxy()->union($selects, $type);
+        return $this->proxy()->union($selects, $type);
     }
 
     /**
@@ -1308,9 +1290,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function unionAll($selects): Condition
+    public function unionAll($selects): Condition
     {
-        return self::proxy()->unionAll($selects);
+        return $this->proxy()->unionAll($selects);
     }
 
     /**
@@ -1320,9 +1302,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function groupBy($expression): Condition
+    public function groupBy($expression): Condition
     {
-        return self::proxy()->groupBy($expression);
+        return $this->proxy()->groupBy($expression);
     }
 
     /**
@@ -1333,9 +1315,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function having(...$cond): Condition
+    public function having(...$cond): Condition
     {
-        return self::proxy()->having(...$cond);
+        return $this->proxy()->having(...$cond);
     }
 
     /**
@@ -1345,9 +1327,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function orHaving(...$cond): Condition
+    public function orHaving(...$cond): Condition
     {
-        return self::proxy()->orHaving(...$cond);
+        return $this->proxy()->orHaving(...$cond);
     }
 
     /**
@@ -1357,9 +1339,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingRaw(string $raw): Condition
+    public function havingRaw(string $raw): Condition
     {
-        return self::proxy()->havingRaw($raw);
+        return $this->proxy()->havingRaw($raw);
     }
 
     /**
@@ -1369,9 +1351,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function orHavingRaw(string $raw): Condition
+    public function orHavingRaw(string $raw): Condition
     {
-        return self::proxy()->orHavingRaw($raw);
+        return $this->proxy()->orHavingRaw($raw);
     }
 
     /**
@@ -1381,9 +1363,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingBetween(...$cond): Condition
+    public function havingBetween(...$cond): Condition
     {
-        return self::proxy()->havingBetween(...$cond);
+        return $this->proxy()->havingBetween(...$cond);
     }
 
     /**
@@ -1393,9 +1375,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingNotBetween(...$cond): Condition
+    public function havingNotBetween(...$cond): Condition
     {
-        return self::proxy()->havingNotBetween(...$cond);
+        return $this->proxy()->havingNotBetween(...$cond);
     }
 
     /**
@@ -1405,9 +1387,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingNull(...$cond): Condition
+    public function havingNull(...$cond): Condition
     {
-        return self::proxy()->havingNull(...$cond);
+        return $this->proxy()->havingNull(...$cond);
     }
 
     /**
@@ -1417,9 +1399,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingNotNull(...$cond): Condition
+    public function havingNotNull(...$cond): Condition
     {
-        return self::proxy()->havingNotNull(...$cond);
+        return $this->proxy()->havingNotNull(...$cond);
     }
 
     /**
@@ -1429,9 +1411,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingIn(...$cond): Condition
+    public function havingIn(...$cond): Condition
     {
-        return self::proxy()->havingIn(...$cond);
+        return $this->proxy()->havingIn(...$cond);
     }
 
     /**
@@ -1441,9 +1423,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingNotIn(...$cond): Condition
+    public function havingNotIn(...$cond): Condition
     {
-        return self::proxy()->havingNotIn(...$cond);
+        return $this->proxy()->havingNotIn(...$cond);
     }
 
     /**
@@ -1453,9 +1435,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingLike(...$cond): Condition
+    public function havingLike(...$cond): Condition
     {
-        return self::proxy()->havingLike(...$cond);
+        return $this->proxy()->havingLike(...$cond);
     }
 
     /**
@@ -1465,9 +1447,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingNotLike(...$cond): Condition
+    public function havingNotLike(...$cond): Condition
     {
-        return self::proxy()->havingNotLike(...$cond);
+        return $this->proxy()->havingNotLike(...$cond);
     }
 
     /**
@@ -1477,9 +1459,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingDate(...$cond): Condition
+    public function havingDate(...$cond): Condition
     {
-        return self::proxy()->havingDate(...$cond);
+        return $this->proxy()->havingDate(...$cond);
     }
 
     /**
@@ -1489,9 +1471,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingDay(...$cond): Condition
+    public function havingDay(...$cond): Condition
     {
-        return self::proxy()->havingDay(...$cond);
+        return $this->proxy()->havingDay(...$cond);
     }
 
     /**
@@ -1501,9 +1483,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingMonth(...$cond): Condition
+    public function havingMonth(...$cond): Condition
     {
-        return self::proxy()->havingMonth(...$cond);
+        return $this->proxy()->havingMonth(...$cond);
     }
 
     /**
@@ -1513,9 +1495,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function havingYear(...$cond): Condition
+    public function havingYear(...$cond): Condition
     {
-        return self::proxy()->havingYear(...$cond);
+        return $this->proxy()->havingYear(...$cond);
     }
 
     /**
@@ -1526,9 +1508,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function orderBy($expression, string $orderDefault = 'ASC'): Condition
+    public function orderBy($expression, string $orderDefault = 'ASC'): Condition
     {
-        return self::proxy()->orderBy($expression, $orderDefault);
+        return $this->proxy()->orderBy($expression, $orderDefault);
     }
 
     /**
@@ -1538,9 +1520,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function latest(string $field = 'create_at'): Condition
+    public function latest(string $field = 'create_at'): Condition
     {
-        return self::proxy()->latest($field);
+        return $this->proxy()->latest($field);
     }
 
     /**
@@ -1550,9 +1532,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function oldest(string $field = 'create_at'): Condition
+    public function oldest(string $field = 'create_at'): Condition
     {
-        return self::proxy()->oldest($field);
+        return $this->proxy()->oldest($field);
     }
 
     /**
@@ -1562,9 +1544,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function distinct(bool $flag = true): Condition
+    public function distinct(bool $flag = true): Condition
     {
-        return self::proxy()->distinct($flag);
+        return $this->proxy()->distinct($flag);
     }
 
     /**
@@ -1575,9 +1557,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function count(string $field = '*', string $alias = 'row_count'): Condition
+    public function count(string $field = '*', string $alias = 'row_count'): Condition
     {
-        return self::proxy()->count($field, $alias);
+        return $this->proxy()->count($field, $alias);
     }
 
     /**
@@ -1588,9 +1570,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function avg(string $field, string $alias = 'avg_value'): Condition
+    public function avg(string $field, string $alias = 'avg_value'): Condition
     {
-        return self::proxy()->avg($field, $alias);
+        return $this->proxy()->avg($field, $alias);
     }
 
     /**
@@ -1601,9 +1583,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function max(string $field, string $alias = 'max_value'): Condition
+    public function max(string $field, string $alias = 'max_value'): Condition
     {
-        return self::proxy()->max($field, $alias);
+        return $this->proxy()->max($field, $alias);
     }
 
     /**
@@ -1614,9 +1596,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function min(string $field, string $alias = 'min_value'): Condition
+    public function min(string $field, string $alias = 'min_value'): Condition
     {
-        return self::proxy()->min($field, $alias);
+        return $this->proxy()->min($field, $alias);
     }
 
     /**
@@ -1627,9 +1609,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function sum(string $field, string $alias = 'sum_value'): Condition
+    public function sum(string $field, string $alias = 'sum_value'): Condition
     {
-        return self::proxy()->sum($field, $alias);
+        return $this->proxy()->sum($field, $alias);
     }
 
     /**
@@ -1637,9 +1619,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function one(): Condition
+    public function one(): Condition
     {
-        return self::proxy()->one();
+        return $this->proxy()->one();
     }
 
     /**
@@ -1647,9 +1629,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function all(): Condition
+    public function all(): Condition
     {
-        return self::proxy()->all();
+        return $this->proxy()->all();
     }
 
     /**
@@ -1659,9 +1641,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function top(int $count = 30): Condition
+    public function top(int $count = 30): Condition
     {
-        return self::proxy()->top($count);
+        return $this->proxy()->top($count);
     }
 
     /**
@@ -1672,9 +1654,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function limit(int $offset = 0, int $count = 0): Condition
+    public function limit(int $offset = 0, int $count = 0): Condition
     {
-        return self::proxy()->limit($offset, $count);
+        return $this->proxy()->limit($offset, $count);
     }
 
     /**
@@ -1684,9 +1666,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function forUpdate(bool $flag = true): Condition
+    public function forUpdate(bool $flag = true): Condition
     {
-        return self::proxy()->forUpdate($flag);
+        return $this->proxy()->forUpdate($flag);
     }
 
     /**
@@ -1697,9 +1679,9 @@ class Db implements IDb
      *
      * @return \Leevel\Database\Condition
      */
-    public static function setOption(string $name, $value): Condition
+    public function setOption(string $name, $value): Condition
     {
-        return self::proxy()->setOption($name, $value);
+        return $this->proxy()->setOption($name, $value);
     }
 
     /**
@@ -1707,9 +1689,9 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function getOption(): array
+    public function getOption(): array
     {
-        return self::proxy()->getOption();
+        return $this->proxy()->getOption();
     }
 
     /**
@@ -1717,18 +1699,8 @@ class Db implements IDb
      *
      * @return array
      */
-    public static function getBindParams(): array
+    public function getBindParams(): array
     {
-        return self::proxy()->getBindParams();
-    }
-
-    /**
-     * 代理服务
-     *
-     * @return \Leevel\Database\Manager
-     */
-    public static function proxy(): Manager
-    {
-        return Container::singletons()->make('databases');
+        return $this->proxy()->getBindParams();
     }
 }
