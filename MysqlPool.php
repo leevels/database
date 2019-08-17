@@ -18,50 +18,51 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Leevel\Database\Ddd;
+namespace Leevel\Database;
 
-use Leevel\Kernel\Exception\NotFoundHttpException;
+use Leevel\Database\Mysql\MysqlPool as MysqlPools;
 
 /**
- * 模型实体未找到异常.
+ * mysql pool 缓存.
  *
  * @author Xiangmin Liu <635750556@qq.com>
  *
- * @since 2017.07.10
+ * @since 2019.07.23
  *
  * @version 1.0
+ * @codeCoverageIgnore
  */
-class EntityNotFoundException extends NotFoundHttpException
+class MysqlPool implements IDatabase
 {
-    /**
-     * 模型实体名字.
-     *
-     * @var string
-     */
-    protected $entity;
+    use Proxy;
 
     /**
-     * 设置模型实体.
+     * Mysql 连接池.
      *
-     * @param string $entity
-     *
-     * @return \Leevel\Database\Ddd\EntityNotFoundException
+     * @var \Leevel\Database\Mysql\MysqlPool
      */
-    public function setEntity(string $entity): self
+    protected $mysqlPool;
+
+    /**
+     * 构造函数.
+     *
+     * @param \Leevel\Database\Mysql\MysqlPool $mysqlPool
+     */
+    public function __construct(MysqlPools $mysqlPool)
     {
-        $this->entity = $entity;
-        $this->message = sprintf('Entity `%s` was not found.', $entity);
-
-        return $this;
+        $this->mysqlPool = $mysqlPool;
     }
 
     /**
-     * 取回模型实体.
+     * 返回代理.
      *
-     * @return string
+     * @return \Leevel\Database\IDatabase
      */
-    public function entity(): string
+    public function proxy(): IDatabase
     {
-        return $this->entity;
+        /** @var \Leevel\Database\IDatabase $mysql */
+        $mysql = $this->mysqlPool->borrowConnection();
+
+        return $mysql;
     }
 }
