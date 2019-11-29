@@ -18,38 +18,58 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Leevel\Database\Console;
+namespace Leevel\Database;
 
-use Leevel\Database\Console\Virtual\Create as VirtualCreate;
-use Phinx\Console\Command\Create as PhinxCreate;
-
-// @codeCoverageIgnoreStart
-if (class_exists(PhinxCreate::class)) {
-    class_alias(PhinxCreate::class, __NAMESPACE__.'\\BaseCreate');
-} else {
-    class_alias(VirtualCreate::class, __NAMESPACE__.'\\BaseCreate');
-}
-// @codeCoverageIgnoreEnd
+use Leevel\Page\Page as BasePage;
 
 /**
- * 数据库迁移创建一个脚本.
+ * 数据库分页查询.
  *
  * @author Xiangmin Liu <635750556@qq.com>
  *
- * @since 2017.05.09
+ * @since 2019.09.14
  *
  * @version 1.0
- * @codeCoverageIgnore
  */
-class Create extends BaseCreate
+class Page extends BasePage
 {
     /**
-     * Configures the current command.
+     * 查询数据.
+     *
+     * @var mixed
      */
-    protected function configure(): void
-    {
-        parent::configure();
+    protected $data;
 
-        $this->setName('migrate:create');
+    /**
+     * 设置数据.
+     *
+     * @param mixed $data
+     */
+    public function setData($data): void
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * 获取数据.
+     *
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * 对象转数组.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'page' => parent::toArray(),
+            'data' => $this->data,
+        ];
     }
 }
