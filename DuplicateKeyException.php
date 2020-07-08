@@ -20,11 +20,13 @@ declare(strict_types=1);
 
 namespace Leevel\Database;
 
-use RuntimeException;
+use PDOException;
 
 /**
- * 构造条件方法未找到异常.
+ * 主键或唯一键重复异常.
+ *
+ * 用于模拟数据库 replace.
  */
-class ConditionNotFoundException extends RuntimeException
+class DuplicateKeyException extends PDOException
 {
 }

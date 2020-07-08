@@ -20,13 +20,11 @@ declare(strict_types=1);
 
 namespace Leevel\Database;
 
-use PDOException;
+use RuntimeException;
 
 /**
- * Replace 异常.
- *
- * 用于模拟数据库 replace.
+ * 构造器方法未找到异常.
  */
-class ReplaceException extends PDOException
+class ConditionErrorException extends RuntimeException
 {
 }
